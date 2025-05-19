@@ -1,9 +1,9 @@
-FROM node:18-bullseye-slim
+FROM oraclelinux:8-slim
 
-# Instala dependências do Oracle Instant Client
-RUN apt-get update && apt-get install -y libaio1 unzip wget   && wget https://download.oracle.com/otn_software/linux/instantclient/838000/instantclient-basiclite-linux.x64-23.8.0.0.0dbru.zip   && wget https://download.oracle.com/otn_software/linux/instantclient/838000/instantclient-sdk-linux.x64-23.8.0.0.0dbru.zip   && unzip instantclient-basiclite-linux.x64-23.8.0.0.0dbru.zip -d /opt   && unzip instantclient-sdk-linux.x64-23.8.0.0.0dbru.zip -d /opt   && rm instantclient-*.zip   && ln -s /opt/instantclient_23_8 /opt/instantclient   && echo '/opt/instantclient' > /etc/ld.so.conf.d/oracle-instantclient.conf   && ldconfig
+# Instala Oracle Instant Client via repositórios oficiais
+RUN microdnf install -y oracle-release-el8  && microdnf install -y oracle-instantclient23.8-basic oracle-instantclient23.8-sqlplus  && microdnf clean all
 
-ENV LD_LIBRARY_PATH=/opt/instantclient
+ENV LD_LIBRARY_PATH=/usr/lib/oracle/23.8/client64/lib
 
 WORKDIR /app
 COPY package.json index.js .env.example .gitignore Dockerfile ./

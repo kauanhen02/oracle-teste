@@ -7,8 +7,6 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-// Docker-based: no initOracleClient here
-
 // Configuração do pool Oracle
 oracledb.createPool({
   user: process.env.DB_USER,

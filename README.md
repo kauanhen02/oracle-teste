@@ -6,7 +6,7 @@ Bot de WhatsApp que consulta o banco Oracle do Mega ERP via Z-API.
 
 - `index.js` – aplicação Node.js principal.
 - `.env.example` – variáveis de ambiente.
-- `Dockerfile` – container Docker com Oracle Instant Client.
+- `Dockerfile` – container Docker com Oracle Instant Client via Oracle Linux.
 - `.gitignore` – para ignorar node_modules e .env.
 - `package.json` – dependências e scripts.
 

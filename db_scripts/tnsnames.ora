@@ -1,0 +1,5 @@
+megacloud =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbconnect.megaerp.online)(PORT = 4221))
+    (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = xepdb1))
+  )

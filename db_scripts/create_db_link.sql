@@ -1,4 +1,0 @@
--- Script para criar o DB Link
-CREATE DATABASE LINK GINGER
-  CONNECT TO GINGER IDENTIFIED BY "SF6QxMuKe_"
-  USING 'megacloud';

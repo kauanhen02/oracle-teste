@@ -1,82 +1,68 @@
-require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
-const axios = require('axios');
 
 const app = express();
-app.use(bodyParser.json());
+const PORT = 3000;
 
-// Configuração do pool Oracle
-oracledb.createPool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  connectString: process.env.DB_CONNECT,
-  poolMin: 1,
-  poolMax: 5,
-  poolIncrement: 1
+app.use((req, res, next) => {
+  res.setHeader('ngrok-skip-browser-warning', 'true');
+  next();
 });
 
-async function queryFragranciasNotas(palavraChave) {
-  const pool = await oracledb.getPool();
-  const conn = await pool.getConnection();
+// Oracle Client config
+oracledb.initOracleClient({
+  libDir: 'C:\\Users\\kauan\\Downloads\\instantclient-basic-windows.x64-23.8.0.25.04\\instantclient_23_8'
+});
+
+// Rota GET com filtro "pr"
+app.get('/produtos', async (req, res) => {
+  let connection;
+
   try {
-    const sql = `
-      SELECT nome
-        FROM fr_shelf
-       WHERE LOWER(notas) LIKE :kw
-    `;
-    const { rows } = await conn.execute(
-      sql,
-      { kw: '%' + palavraChave.toLowerCase() + '%' },
+    connection = await oracledb.getConnection({
+      user: 'GINGER',
+      password: 'SF6QxMuKe_',
+      connectString: 'dbconnect.megaerp.online:4221/xepdb1'
+    });
+
+    const result = await connection.execute(
+      `SELECT * FROM MEGA.gg_vw_produtos@GINGER WHERE LOWER(PRO_IN_CODIGO) LIKE '%pr%'`,
+      [],
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-    return rows.map(r => r.NOME);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Erro Oracle:', err);
+    res.status(500).json({ erro: err.message });
   } finally {
-    await conn.close();
-  }
-}
-
-async function sendWhatsApp(to, text) {
-  await axios.post(process.env.ZAPI_URL, {
-    phone: to,
-    message: text
-  }, {
-    headers: { 'x-api-key': process.env.ZAPI_TOKEN }
-  });
-}
-
-app.post('/webhook', async (req, res) => {
-  const { from, body } = req.body;
-  console.log(`<- ${from}: ${body}`);
-  let reply = 'Desculpe, não entendi sua pergunta.';
-
-  const match = body.match(/fragrancias.*notas de (\w+)/i);
-  if (match) {
-    const nota = match[1];
-    try {
-      const lista = await queryFragranciasNotas(nota);
-      if (lista.length) {
-        reply = 'Fragrâncias com nota de ' + nota + ':\n' +
-                lista.map((n, i) => `${i+1}. ${n}`).join('\n');
-      } else {
-        reply = `Nenhuma fragrância com nota de ${nota} encontrada.`;
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error('Erro ao fechar conexão:', err);
       }
-    } catch (err) {
-      console.error(err);
-      reply = 'Erro ao consultar o banco: ' + err.message;
+    }
+  }
+});
+
+// Acessível de qualquer rede (se firewall permitir)
+const os = require('os');
+
+app.listen(PORT, '0.0.0.0', () => {
+  const interfaces = os.networkInterfaces();
+  const addresses = [];
+
+  for (let iface of Object.values(interfaces)) {
+    for (let config of iface) {
+      if (config.family === 'IPv4' && !config.internal) {
+        addresses.push(config.address);
+      }
     }
   }
 
-  try {
-    await sendWhatsApp(from, reply);
-    console.log(`-> ${from}: ${reply}`);
-    res.sendStatus(200);
-  } catch (err) {
-    console.error('Erro Z-API:', err.message);
-    res.sendStatus(500);
-  }
+  addresses.forEach(addr => {
+    console.log(`✅ API acessível em: http://${addr}:${PORT}/produtos`);
+  });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Bot rodando na porta ${PORT}`));

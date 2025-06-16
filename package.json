@@ -1,15 +1,6 @@
 {
-  "name": "wp-oracle-bot",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
   "dependencies": {
-    "express": "^4.18.2",
-    "body-parser": "^1.20.2",
-    "oracledb": "^6.0.0",
-    "axios": "^1.5.0",
-    "dotenv": "^16.3.1"
+    "express": "^5.1.0",
+    "oracledb": "^6.8.0"
   }
 }

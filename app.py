@@ -21,7 +21,7 @@ def produtos():
         cursor = connection.cursor()
         cursor.execute("""
             SELECT * FROM MEGA.gg_vw_produtos@GINGER
-            WHERE LOWER(PRO_ST_DESCRICAO) LIKE '%pr%'
+            WHERE LOWER(PRO_IN_CODIGO) LIKE '%pr%'
         """)
 
         columns = [col[0] for col in cursor.description]

@@ -20,11 +20,12 @@ def produtos():
 
         cursor = connection.cursor()
         cursor.execute("""
-           SELECT p.PRO_IN_CODIGO, p.PRO_ST_DESCRICAO, c.re_custo
+    SELECT p.PRO_IN_CODIGO, p.PRO_ST_DESCRICAO, c.re_custo
     FROM MEGA.gg_vw_composicao@GINGER c
     INNER JOIN MEGA.gg_vw_produtos@GINGER p
         ON c.PRO_IN_CODIGO = p.PRO_IN_CODIGO
-    WHERE LOWER(c.PRO_IN_CODIGO) LIKE '%pr%'
+    WHERE LOWER(TO_CHAR(c.PRO_IN_CODIGO)) LIKE '%pr%'
+    FETCH FIRST 50 ROWS ONLY
         """)
 
         columns = [col[0] for col in cursor.description]

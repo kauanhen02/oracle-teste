@@ -20,17 +20,7 @@ def produtos():
 
         cursor = connection.cursor()
         cursor.execute("""
-           SELECT 
-    p.PRO_IN_CODIGO ,
-    p.PRO_ST_DESCRICAO,
-    c.re_custo
-FROM 
-    gg_vw_composicao c
-INNER JOIN 
-    gg_vw_produtos p 
-    ON c.PRO_IN_CODIGO = p.PRO_IN_CODIGO
-WHERE 
-    LOWER(c.PRO_IN_CODIGO) LIKE '%pr%';
+        SELECT p.PRO_IN_CODIGO, p.PRO_ST_DESCRICAO, c.re_custo FROM gg_vw_composicao c INNER JOIN gg_vw_produtos p ON c.PRO_IN_CODIGO = p.PRO_IN_CODIGO WHERE LOWER(c.PRO_IN_CODIGO) LIKE '%pr%';
         """)
 
         columns = [col[0] for col in cursor.description]
